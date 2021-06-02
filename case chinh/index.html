@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1 style="color: red;text-align: center">Gunbow By Mon</h1>
+<canvas id="canvas" width="1000" height="600"
+        tabindex="1" style="border: 1px solid;cursor: crosshair"></canvas>
+<script src="key.js"></script>
+<script src="Bullet.js"></script>
+<script src="cannon.js"></script>
+<script src="cannon2.js"></script>
+<script src="map.js"></script>
+<script>
+    const AVAILABLE_KEYS =
+        [
+            Keys.KEY_A,
+            Keys.KEY_D,
+            Keys.KEY_J,
+            Keys.KEY_L,
+            Keys.ENTER,
+            Keys.SPACE,
+        ];
+
+    var _canvas;
+    var _context;
+    var _tank;
+    var _tank2
+    var _keypressed = {};
+    var GRAVITY=0.01
+    var turn;
+
+
+    function clear() {
+        _context.clearRect(0, 0, _canvas.width, _canvas.height);
+    }
+
+    function init() {
+        _canvas = document.getElementById("canvas");
+        _context = _canvas.getContext("2d");
+        _tank = new Tank(_canvas.width, _canvas.height);
+        _tank2=new Tank2(_canvas.width, _canvas.height);
+        draw();
+    }
+
+    function draw() {
+        clear();
+        _tank.draw(_context);
+        _tank2.draw(_context);
+    }
+
+    function update() {
+        _tank.update();
+        _tank2.update();
+        draw();
+    }
+
+    function canvas_mousemove(e) {
+
+        var x = e.pageX - _canvas.offsetLeft;
+        var y = e.pageY - _canvas.offsetTop;
+        _tank.rotateCannon(x, y);
+        _tank2.rotateCannon(x, y);
+    }
+    function canvas_keyDown(e) {
+        e.preventDefault();
+        if (AVAILABLE_KEYS.indexOf(e.keyCode) != -1) {
+            _keypressed[e.keyCode] = true;
+            doKeypress();
+            doKeypress2()
+        }
+    }
+
+    function canvas_keyUp(e) {
+        e.preventDefault();
+        if (_keypressed[e.keyCode]) {
+            _keypressed[e.keyCode] = false;
+            _tank.resetSpeed();
+            _tank2.resetSpeed();
+        }
+    }
+    function canvas_mousedown(e){
+        _tank.fire()
+    }
+
+    function doKeypress() {
+        if (_keypressed[Keys.KEY_A])
+            _tank.moveLeft();
+        if (_keypressed[Keys.KEY_D])
+            _tank.moveRight();
+        _tank.move();
+        draw()
+
+    }
+    function doKeypress2(){
+        if(_keypressed[Keys.KEY_J])
+            _tank2.moveLeft();
+        if(_keypressed[Keys.KEY_L])
+            _tank2.moveRight();
+        _tank2.move();
+        draw();
+
+    }
+
+    // onload
+    init();
+    _canvas.onkeydown = canvas_keyDown;
+    _canvas.onkeyup = canvas_keyUp;
+    _canvas.onmousemove = canvas_mousemove;
+    _canvas.onmousedown = canvas_mousedown;
+    window.setInterval(update, 30);
+</script>
+</body>
+</html>
